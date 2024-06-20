@@ -462,9 +462,9 @@ LE 에서. traefik의 일부입니다.</br>
 
   `touch acme.json && chmod 600 acme.json`
 
-- **443 진입점 및 인증서 확인자를 TRAEFIK에 추가합니다.yml**</br>
+- **443 진입점 및 인증서 확인자(리졸버)를 TRAEFIK에 추가합니다.yml**</br>
 
-  진입점 섹션에 웹시큐어라는 새로운 진입점이 추가되고 포트 443 인증서 확인자는 traefik에 acme 확인자를 사용하여 인증서를 가져오는 방법을 알려주는 구성 섹션입니다.
+  진입점 섹션에 웹시큐어라는 새로운 진입점이 추가되고 포트 443 인증서 확인자(리졸버)는 traefik에 acme 확인자(리졸버)를 사용하여 인증서를 가져오는 방법을 알려주는 구성 섹션입니다.
 
     ```
     certificatesResolvers:
@@ -477,7 +477,7 @@ LE 에서. traefik의 일부입니다.</br>
             entryPoint: web
     ```
 
-  - 리졸버의 이름은 `lets-encr`이고 acme을 사용합니다.
+  - 확인자(리졸버)의 이름은 `lets-encr`이고 acme을 사용합니다.
   - 스테이징 caServer를 주석 처리하면 LE가 스테이징 인증서를 발급합니다,
 유효하지 않은 인증서이며 녹색 잠금을 제공하지 않지만 제한은 없습니다,
 따라서 테스트하기에 좋습니다. 작동하면 암호화하자에서 발행했다고 표시됩니다.
@@ -551,7 +551,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
 - **컨테이너에 필수 레이블 추가**</br>
 첫 번째 장의 일반 HTTP와 비교해보십시오,
-라우터의 진입점를 `web`에서 `websecure`로 변경하는 것입니다. 그리고 `lets-encr`라는 이름의 인증서 확인자를 기존 라우터에 할당합니다. 
+라우터의 진입점를 `web`에서 `websecure`로 변경하는 것입니다. 그리고 `lets-encr`라는 이름의 인증서 확인자(리졸버)를 기존 라우터에 할당합니다. 
 
     `whoami-docker-compose.yml`
     ```
@@ -609,7 +609,6 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
 프로세스에 대한 이해가 단순해졌습니다.
 
-
 `LE` - Let's Encrypt. 무료 인증서를 제공하는 서비스</br>
 `인증서` - 서버의 파일에 저장된 암호화 키입니다,
 암호화 통신을 허용하고 신원을 확인합니다< /br> .
@@ -617,46 +616,38 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 에서. traefik의 일부입니다.</br>
 `DNS` - 인터넷의 서버, 도메인 이름을 IP 주소로 변환</br&t;;
 
-
-Traefik은 ACME를 사용하여 `whateverblablabla.org`와 같은 특정 도메인에 대한 인증서를 LE에 요청합니다.
-LE는 무작위로 생성된 텍스트로 응답하며, traefik은 이 텍스트를 새 DNS TXT 레코드로 저장합니다.
-그런 다음 LE는 `whateverblablabla.org` DNS 레코드를 확인하여 텍스트가 존재하는지 확인합니다.
+  Traefik은 ACME를 사용하여 `whateverblablabla.org`와 같은 특정 도메인에 대한 인증서를 LE에 요청합니다.
+  LE는 무작위로 생성된 텍스트로 응답하며, traefik은 이 텍스트를 새 DNS TXT 레코드로 저장합니다.
+  그런 다음 LE는 `whateverblablabla.org` DNS 레코드를 확인하여 텍스트가 존재하는지 확인합니다.
   
-인증서가 있으면 인증서를 요청한 사람이 도메인을 제어하고 있다는 것을 증명합니다.
-인증서가 발급되며 3개월 동안 유효합니다. Traefik에서 자동으로 갱신을 시도합니다.
-남은 기간이 30일 미만인 경우
+  인증서가 있으면 인증서를 요청한 사람이 도메인을 제어하고 있다는 것을 증명합니다.
+  인증서가 발급되며 3개월 동안 유효합니다. 남은 기간이 30일 미만이면 Traefik에서 자동으로 갱신을 시도합니다.
+
+  와일드카드 인증서를 사용할 수 있다는 점이 httpChallenge보다 유리합니다.
+  `*.whateverblablabla.org` 모든 하위 도메인의 유효성을 검사하는 인증서입니다. </br>
+  또한 포트가 열려 있을 필요도 없습니다.
+
+  하지만 Traefik은 DNS 레코드를 자동으로 변경할 수 있어야 합니다,
+  따라서 사이트 DNS를 관리하는 사람이 이를 지원해야 합니다.
+  그렇기 때문에 Cloudflare를 선택해야 합니다.
 
 
-와일드카드 인증서를 사용할 수 있다는 점이 httpChallenge보다 유리합니다.
-모든 하위 도메인의 유효성을 검사하는 인증서입니다. `*.whateverblablabla.org`</br> .
-또한 포트가 열려 있을 필요도 없습니다.
-
-
-하지만 Traefik은 DNS 레코드를 자동으로 변경할 수 있어야 합니다,
-따라서 사이트 DNS를 관리하는 사람이 이를 지원해야 합니다.
-그렇기 때문에 Cloudflare를 선택해야 합니다.
-
-
-이제 실제로 완료하는 방법을 알아보세요.
+  이제 실제로 완료하는 방법을 알아보세요.
 
 
 - **계획된 모든 하위 도메인에 대해 유형 A DNS 레코드 추가**
 
+  [whoami, nginx, \*] 이 하위 도메인 입니다. 각각의 A-record 는 traefik IP 를 가리켜야 합니다.
 
-whoami, nginx, \*
-
-- **600개의 권한이 있는 빈 acme.json 파일을 만듭니다**
+- **600 권한이 있는 빈 acme.json 파일을 만듭니다**
 
 
 `touch acme.json && chmod 600 acme.json`
 
 
-- **443 진입점 및 인증서 확인자를 traefik에 추가합니다.yml**</br>
+- **443 진입점 및 인증서 확인자(리졸버)를 traefik.yml에 추가합니다**</br>
 
-
-진입점 섹션에 웹시큐어(포트 443)라는 새 진입점가 추가되었습니다.
-certificatesResolvers는 traefik에 다음을 알려주는 구성 섹션입니다.
-ACME 해결기를 사용하여 인증서를 얻는 방법.< /br>
+  엔트리포인트 섹션에 웹시큐어, 포트 443 인증서 확인자(리졸버)라는 새로운 엔트리포인트가 추가되었습니다.</br> 인증서를 얻기 위해 acme 확인자(리졸버)를 사용하는 방법을 traefik에 알려주는 구성 섹션입니다.
 
     ```
     certificatesResolvers:
@@ -672,16 +663,15 @@ ACME 해결기를 사용하여 인증서를 얻는 방법.< /br>
             - "8.8.8.8:53"
     ```
 
-- 리졸버의 이름은 `lets-encr`이고 acme을 사용합니다.
+- 확인자(리졸버)의 이름은 `lets-encr`이고 acme을 사용합니다.
 - 스테이징 caServer를 주석 처리하면 LE가 스테이징 인증서를 발급합니다,
-유효하지 않은 인증서이며 녹색 잠금을 제공하지 않지만 제한은 없습니다,
-작동 중이면 암호화하자에서 발행했다고 표시됩니다.
+  그것은 유효하지 않은 인증서이며 녹색 잠금을 제공하지 않지만 제한은 없습니다,
+  작동 중이면 레츠 인증서에서 발행했다고 표시됩니다.
 - 저장소는 주어진 인증서를 저장할 위치를 알려줍니다 - `acme.json`
 - 이메일은 LE가 인증서 만료에 대한 알림을 보내는 곳입니다.
-- dnsChallenge는 [제공자](https://docs.traefik.io/https/acme/#providers),
-이 경우 클라우드플레어입니다. 각 공급자는 서로 다른 이름의 환경 변수가 필요합니다.
-를 추가해야 하지만 이는 나중에 설명하며, 여기서는 공급자 이름만 있으면 됩니다.
-- 확인자는 챌린지 중에 사용할 잘 알려진 DNS 서버의 IP입니다.
+- dnsChallenge는 [제공자](https://docs.traefik.io/https/acme/#providers)에 따라 다릅니다,
+  이 경우 클라우드플레어입니다. 각 공급자는 .env 파일에 다른 이름의 환경 변수가 필요하지만, 여기서는 공급자의 이름만 있으면 됩니다.
+- 확인자(리졸버)는 챌린지 중에 사용할 잘 알려진 DNS 서버의 IP입니다.
 
   `traefik.yml`
   ```
@@ -717,11 +707,11 @@ ACME 해결기를 사용하여 인증서를 얻는 방법.< /br>
             - "8.8.8.8:53"
   ```
 
-- **에 `를 추가합니다.env` 파일에 필수 변수 추가**</br>
-[지원되는 제공업체 목록](https://docs)를 기반으로 어떤 변수를 추가할지 알 수 있습니다.traefik.io/https/acme/#providers).</br>
+- **`.env`에 에다가 파일에 필수 변수를 추가합니다**</br>
+[지원되는 제공업체 목록](https://docs.traefik.io/https/acme/#providers)을 기반으로 어떤 변수를 추가할지 알 수 있습니다.</br>
 클라우드플레어 변수는 다음과 같습니다.
-- `CF_API_EMAIL` - 클라우드플레어 로그인
-- `CF_API_KEY` - 글로벌 API 키
+  - `CF_API_EMAIL` - 클라우드플레어 로그인
+  - `CF_API_KEY` - 글로벌 API 키
 
   `.env`
   ```
@@ -731,10 +721,10 @@ ACME 해결기를 사용하여 인증서를 얻는 방법.< /br>
   CF_API_KEY=8d08c87dadb0f8f0e63efe84fb115b62e1abc
   ```
 
-- **expose/map 포트 443 및 마운트 acme.json**을 traefik-docker-compose.yml에 추가합니다.
+- traefik-docker-compose.yml에 **포트 443 노출/연결 및 acme.json 마운트**를 추가합니다.
 
 
-acme.json이 **not** :ro - 읽기 전용이라는 점에 유의하세요.
+acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
   `traefik-docker-compose.yml`
   ```
@@ -763,14 +753,13 @@ acme.json이 **not** :ro - 읽기 전용이라는 점에 유의하세요.
   ```
 
 - **컨테이너에 필수 레이블 추가**</br>
-첫 번째 장의 일반 HTTP와 비교하여
-- 라우터의 진입점가 `web로 전환됩니다. class="ͼe">`에서 `websecure`로 전환됩니다.
-<라우터에 할당된 `lets-encr`이라는 이름의 인증서 확인자
-- 인증서를 받을 기본 도메인을 정의하는 레이블입니다,
-여기서는 whoami.whateverblablabla.org이며, `.env` 파일에서 가져온 도메인 이름입니다.
-
-`whoami-docker-compose.yml`
-```
+  첫 번째 장의 일반 HTTP와 비교하여
+  - 라우터의 진입점이 `web`에서 `websecure`로 전환됩니다.
+  - 라우터에 할당된 `lets-encr`이라는 이름의 인증서 확인자(리졸버)
+  - 인증을 받을 주 도메인의 레이블을 정의하기, 이 안에서서는 whoami.whateverblablabla.org 이다, 그리고 도메인 이름은 `.env` 에서 가져온다.
+ 
+  `whoami-docker-compose.yml`
+  ```
   version: "3.7"
 
   services:
@@ -818,6 +807,8 @@ acme.json이 **not** :ro - 읽기 전용이라는 점에 유의하세요.
   `docker-compose -f whoami-docker-compose.yml up -d`</br>
   `docker-compose -f nginx-docker-compose.yml up -d`</br>
 
+== 여기까지 작업함
+
 - **제길, DNS 챌린지의 핵심은 와일드카드를 얻는 것입니다!**</br>
 충분히 공정</br>
 따라서 와일드카드의 경우 이 레이블은 traefik 컴포지션에 들어갑니다.
@@ -861,7 +852,7 @@ DNS 제어판에서 traefik의 IP를 가리키는 A 레코드로 설정합니다
 
 이제 컨테이너를 하위 도메인으로 액세스하려는 경우,
 URL에 대한 규칙이 있는 일반 라우터만 있으면 됩니다,
-443 포트 진입점에 있어야 하며 동일한 `lets-encr` 인증서 확인자를 사용해야 합니다.
+443 포트 진입점에 있어야 하며 동일한 `lets-encr` 인증서 확인자(리졸버)를 사용해야 합니다.
 
     `whoami-docker-compose.yml`
     ```
