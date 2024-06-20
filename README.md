@@ -595,48 +595,55 @@ and assigning certificate resolver named `lets-encr` to the existing router
         external:
           name: $DEFAULT_NETWORK
     ```
-- **run the damn containers**</br>
-  give it a minute</br>
-  containers will now work only over https and have the greenlock</br>
+- **그 망할 컨테이너를 실행하세요**</br>
+잠시만 기다려주세요</br>
+컨테이너는 이제 https를 통해서만 작동하며 greenlock< /br> 을 갖습니다.
 
-  *extra info:*</br>
-  check content of acme.json</br>
-  delete acme.json if you want fresh start
- 
-# #5 let's encrypt certificate DNS challenge on cloudflare
+
+*추가 정보 :*</br>
+acme.json의 내용 확인</br>
+새로 시작하려면 acme.json을 삭제하세요.
+# #5 클라우드플레어에서 인증서 DNS 챌린지를 암호화하자
 
 ![letsencrypt-dns-challenge-pic](https://i.imgur.com/dkgxFTR.png)
 
-  My understanding of the process, simplified.
+프로세스에 대한 이해가 단순해졌습니다.
 
-  `LE` - Let's Encrypt. A service that gives out free certificates</br>
-  `Certificate` - a cryptographic key stored in a file on the server,
-   allows encrypted communication and confirms the identity</br>
-  `ACME` - a protocol(precisely agreed way of communication) to negotiate certificates
-  from LE. It is part of traefik.</br>
-  `DNS` - servers on the internet, translate domain names in to ip address</br>
 
-  Traefik uses ACME to ask LE for a certificate for a specific domain, like `whateverblablabla.org`.
-  LE answers with some random generated text that traefik puts as a new DNS TXT record.
-  LE then checks `whateverblablabla.org` DNS records to see if the text is there.
+`LE` - Let's Encrypt. 무료 인증서를 제공하는 서비스</br>
+`인증서` - 서버의 파일에 저장된 암호화 키입니다,
+암호화 통신을 허용하고 신원을 확인합니다< /br> .
+`` - 인증서를 협상하기 위한 프로토콜(정확하게 합의된 통신 방식)
+에서. traefik의 일부입니다.</br>
+`DNS` - 인터넷의 서버, 도메인 이름을 IP 주소로 변환</br&t;;
+
+
+Traefik은 ACME를 사용하여 `whateverblablabla.org`와 같은 특정 도메인에 대한 인증서를 LE에 요청합니다.
+LE는 무작위로 생성된 텍스트로 응답하며, traefik은 이 텍스트를 새 DNS TXT 레코드로 저장합니다.
+그런 다음 LE는 `whateverblablabla.org` DNS 레코드를 확인하여 텍스트가 존재하는지 확인합니다.
   
-  If it's there then this proves that whoever asked for the certificate controls the domain.
-  Certificate is given and is valid for 3 months. Traefik will automatically try to renew
-  when less than 30 days is remaining.
+인증서가 있으면 인증서를 요청한 사람이 도메인을 제어하고 있다는 것을 증명합니다.
+인증서가 발급되며 3개월 동안 유효합니다. Traefik에서 자동으로 갱신을 시도합니다.
+남은 기간이 30일 미만인 경우
 
-  Benefit over httpChallenge is ability to have wild card certificates.
-  These are certificates that validate all subdomains `*.whateverblablabla.org`</br>
-  Also no ports are needed to be open.
 
-  But traefik needs to be able to make these automated changes to DNS records,
-  so there needs to be support for this from whoever manages sites DNS.
-  Thats why going with cloudflare.
+와일드카드 인증서를 사용할 수 있다는 점이 httpChallenge보다 유리합니다.
+모든 하위 도메인의 유효성을 검사하는 인증서입니다. `*.whateverblablabla.org`</br> .
+또한 포트가 열려 있을 필요도 없습니다.
 
-  Now how to actually get it done.
 
-- **add type A DNS records for all planned subdomains**
+하지만 Traefik은 DNS 레코드를 자동으로 변경할 수 있어야 합니다,
+따라서 사이트 DNS를 관리하는 사람이 이를 지원해야 합니다.
+그렇기 때문에 Cloudflare를 선택해야 합니다.
 
-  [whoami, nginx, \*] are used example subdomains, each one should have A-record pointing at traefik IP
+
+이제 실제로 완료하는 방법을 알아보세요.
+
+
+- **계획된 모든 하위 도메인에 대해 유형 A DNS 레코드 추가**
+
+
+whoami, nginx, \*
 
 - **600개의 권한이 있는 빈 acme.json 파일을 만듭니다**
 
