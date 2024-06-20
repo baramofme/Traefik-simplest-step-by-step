@@ -638,16 +638,18 @@ and assigning certificate resolver named `lets-encr` to the existing router
 
   [whoami, nginx, \*] are used example subdomains, each one should have A-record pointing at traefik IP
 
-- **create an empty acme.json file with 600 permissions**
+- **600개의 권한이 있는 빈 acme.json 파일을 만듭니다**
 
-  `touch acme.json && chmod 600 acme.json`
 
-- **add 443 entrypoint and certificate resolver to traefik.yml**</br>
+`touch acme.json && chmod 600 acme.json`
 
-  In entrypoint section new entrypoint is added called websecure, port 443
-  
-  certificatesResolvers is a configuration section that tells traefik
-  how to use acme resolver to get certificates.</br>
+
+- **443 진입점 및 인증서 확인자를 traefik에 추가합니다.yml**</br>
+
+
+엔트리포인트 섹션에 웹시큐어(포트 443)라는 새 엔트리포인트가 추가되었습니다.
+certificatesResolvers는 traefik에 다음을 알려주는 구성 섹션입니다.
+ACME 해결기를 사용하여 인증서를 얻는 방법.< /br>
 
     ```
     certificatesResolvers:
@@ -663,16 +665,16 @@ and assigning certificate resolver named `lets-encr` to the existing router
             - "8.8.8.8:53"
     ```
 
-  - the name of the resolver is `lets-encr` and uses acme
-  - commented out staging caServer makes LE issue a staging certificate,
-    it is an invalid certificate and wont give green lock but has no limitations,
-    if it's working it will say issued by let's encrypt.
-  - Storage tells where to store given certificates - `acme.json`
-  - The email is where LE sends notification about certificates expiring
-  - dnsChallenge is specified with a [provider](https://docs.traefik.io/https/acme/#providers),
-    in this case cloudflare. Each provider needs differently named environment variable
-    in the .env file, but thats later, here it just needs the name of the provider
-  - resolvers are IP of well known DNS servers to use during challenge
+- 리졸버의 이름은 `lets-encr`이고 acme을 사용합니다.
+- 스테이징 caServer를 주석 처리하면 LE가 스테이징 인증서를 발급합니다,
+유효하지 않은 인증서이며 녹색 잠금을 제공하지 않지만 제한은 없습니다,
+작동 중이면 암호화하자에서 발행했다고 표시됩니다.
+- 저장소는 주어진 인증서를 저장할 위치를 알려줍니다 - `acme.json`
+- 이메일은 LE가 인증서 만료에 대한 알림을 보내는 곳입니다.
+- dnsChallenge는 [제공자](https://docs.traefik.io/https/acme/#providers),
+이 경우 클라우드플레어입니다. 각 공급자는 서로 다른 이름의 환경 변수가 필요합니다.
+를 추가해야 하지만 이는 나중에 설명하며, 여기서는 공급자 이름만 있으면 됩니다.
+- 확인자는 챌린지 중에 사용할 잘 알려진 DNS 서버의 IP입니다.
 
   `traefik.yml`
   ```
@@ -708,11 +710,11 @@ and assigning certificate resolver named `lets-encr` to the existing router
             - "8.8.8.8:53"
   ```
 
-- **to the `.env` file add required variables**</br>
-We know what variables to add based on the [list of supported providers](https://docs.traefik.io/https/acme/#providers).</br>
-For cloudflare variables are 
-  - `CF_API_EMAIL` - cloudflare login
-  - `CF_API_KEY` - global api key
+- **에 `를 추가합니다.env` 파일에 필수 변수 추가**</br>
+[지원되는 제공업체 목록](https://docs)를 기반으로 어떤 변수를 추가할지 알 수 있습니다.traefik.io/https/acme/#providers).</br>
+클라우드플레어 변수는 다음과 같습니다.
+- `CF_API_EMAIL` - 클라우드플레어 로그인
+- `CF_API_KEY` - 글로벌 API 키
 
   `.env`
   ```
@@ -722,9 +724,10 @@ For cloudflare variables are
   CF_API_KEY=8d08c87dadb0f8f0e63efe84fb115b62e1abc
   ```
 
-- **expose/map port 443 and mount acme.json** in traefik-docker-compose.yml 
+- **expose/map 포트 443 및 마운트 acme.json**을 traefik-docker-compose.yml에 추가합니다.
 
-  Notice that acme.json is **not** :ro - read only
+
+acme.json이 **not** :ro - 읽기 전용이라는 점에 유의하세요.
 
   `traefik-docker-compose.yml`
   ```
@@ -752,13 +755,12 @@ For cloudflare variables are
           name: $DEFAULT_NETWORK
     ```
 
-- **add required labels to containers**</br>
-  compared to just plain http from the first chapter
-  - router's entryPoint is switched from `web` to `websecure`
-  - certificate resolver named `lets-encr` assigned to the router
-  - a label defining main domain that will get the certificate,
-    in this it is whoami.whateverblablabla.org, domain name pulled from `.env` file
-  
+- **컨테이너에 필수 레이블 추가**</br>
+첫 번째 장의 일반 HTTP와 비교하여
+- 라우터의 엔트리포인트가 `web로 전환됩니다. class="ͼe">`에서 `websecure`로 전환됩니다.
+<라우터에 할당된 `lets-encr`이라는 이름의 인증서 확인자
+- 인증서를 받을 기본 도메인을 정의하는 레이블입니다,
+여기서는 누가미.whateverblablabla.org이며, `.env` 파일에서 가져온 도메인 이름입니다.
   `whoami-docker-compose.yml`
   ```
   version: "3.7"
@@ -803,20 +805,19 @@ For cloudflare variables are
       external:
         name: $DEFAULT_NETWORK
   ```
-- **run the damn containers**</br>
+- **그 망할 컨테이너를 실행하세요**</br>
   `docker-compose -f traefik-docker-compose.yml up -d`</br>
   `docker-compose -f whoami-docker-compose.yml up -d`</br>
   `docker-compose -f nginx-docker-compose.yml up -d`</br>
 
-- **Fuck that, the whole point of DNS challenge is to get wildcards!**</br>
-  fair enough</br>
-  so for wildcard these labels go in to traefik compose.
-  - same `lets-encr` certificateresolver is used as before, the one defined in traefik.yml
-  - the wildcard for subdomains(*.whateverblablabla.org) is set as the main domain to get certificate for
-  - the naked domain(just plain whateverblablabla.org) is set as sans(Subject Alternative Name)
-  
-  again, you do need `*.whateverblablabla.org` and `whateverblablabla.org` 
-  set in your DNS control panel as A-record pointing to IP of traefik
+- **제길, DNS 챌린지의 핵심은 와일드카드를 얻는 것입니다!**</br>
+충분히 공정</br>
+따라서 와일드카드의 경우 이 레이블은 traefik 컴포지션에 들어갑니다.
+- 이전과 동일한 `lets-encr` 인증자 해결사가 사용되며, traefik.yml에 정의된 것과 동일합니다.
+- 하위 도메인에 대한 와일드카드(*.whateverblablabla.org)가 인증서를 받을 기본 도메인으로 설정됩니다.
+- 네이키드 도메인(그냥 무엇이든블라블라.org)은 sans(제목 대체 이름)로 설정됩니다.
+다시 말하지만, `*.whateverblablabla.org` 및 `whateverblablabla.org`가 필요합니다.
+DNS 제어판에서 traefik의 IP를 가리키는 A 레코드로 설정합니다.
 
   `traefik-docker-compose.yml`
   ```
@@ -849,9 +850,10 @@ For cloudflare variables are
         name: $DEFAULT_NETWORK
   ```
 
-  Now if a container wants to be accessible as a subdomain,
-  it just needs a regular router that has rule for the url,
-  be on 443 port entrypoint, and use the same `lets-encr` certificate resolver
+
+이제 컨테이너를 하위 도메인으로 액세스하려는 경우,
+URL에 대한 규칙이 있는 일반 라우터만 있으면 됩니다,
+443 포트 진입점에 있어야 하며 동일한 `lets-encr` 인증서 확인자를 사용해야 합니다.
 
     `whoami-docker-compose.yml`
     ```
@@ -895,7 +897,7 @@ For cloudflare variables are
           name: $DEFAULT_NETWORK
     ```
 
-  Here is apache but this time run on the naked domain `whateverblablabla.org`</br>
+다음은 아파치이지만 이번에는 네이키드 도메인 `whateverblablabla.org`</br
     
     `apache-docker-compose.yml`
     ```
