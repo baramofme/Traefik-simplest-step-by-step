@@ -918,50 +918,56 @@ For cloudflare variables are
           name: $DEFAULT_NETWORK
     ```
 
-# #6 redirect http traffic to https
+# #6 http 트래픽을 https로 리디렉션
 
-  ![padlocks-pic](https://i.imgur.com/twTDSym.png)
 
-  http stops working with https setup, better to redirect http(80) to https(443).</br>
-  Traefik has special type of middleware for this purpose - redirectscheme.
+![padlocks-pic](https://i.imgur.com/twTDSym.png)
 
-  There are several places where this redirect can be declared,
-  in `traefik.yml`, in the dynamic section when `traefik.yml` itself is set as a file provider.</br>
-  Or using labels in any running container, this example does it in traefik compose.
 
-- **add new router and a redirect scheme using labels in traefik compose**
+http(80)을 https(443)으로 리디렉션하는 것이 좋습니다.< /br>
+Traefik에는 이를 위한 특별한 유형의 미들웨어인 redirectscheme이 있습니다.
+
+
+이 리디렉션을 선언할 수 있는 곳은 여러 곳이 있습니다,
+`traefik.yml`에서 동적 섹션에서 `traefik.yml` 자체가 파일 공급자로 설정됩니다.</br>
+또는 실행 중인 컨테이너에서 레이블을 사용하거나, 이 예제에서는 traefik 컴포즈에서 레이블을 사용합니다.
+
+
+- **트레픽 작성에서 레이블을 사용하여 새 라우터 및 리디렉션 체계를 추가**
 
   >\- "traefik.enable=true"
 
-  enables traefik on this traefik container,
-  not that there is need of the typical routing to a service here,
-  but other labels would not work without this
+이 트라픽 컨테이너에서 트라픽을 활성화합니다,
+여기에는 서비스에 대한 일반적인 라우팅이 필요하지 않습니다,
+이 없으면 다른 레이블이 작동하지 않습니다.
 
   >\- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
-  creates new middleware called `redirect-to-https`, type "redirectscheme"
-  and assigns it scheme `https`.</br>
+라는 새 미들웨어를 생성합니다. `redirect-to-https`, "redirectscheme"을 입력합니다.
+를 지정하고 `https`.</br>.
 
   >\- "traefik.http.routers.redirect-https.rule=hostregexp(`{host:.+}`)"
 
-  creates new router called `redirect-https`, with a regex rule that
-  catches any and every incoming request
+는 다음과 같은 정규식 규칙을 사용하여 `redirect-https`라는 새 라우터를 생성합니다.
+모든 수신 요청을 포착합니다.
 
   >\- "traefik.http.routers.redirect-https.entrypoints=web"
 
-  declares on which entrypoint this router listens - web(port 80) </br>
+이 라우터가 수신 대기하는 엔트리포인트를 선언합니다 - 웹(포트 80) </br>
 
   >\- "traefik.http.routers.redirect-https.middlewares=redirect-to-https"
 
-  assigns the freshly created redirectscheme middleware to this freshly created router.
+는 새로 생성된 리디렉션스킴 미들웨어를 이 새로 생성된 라우터에 할당합니다.
 
-  So to sum it up, when a request comes at port 80, router that listens at that entrypoint looks at it.
-  If it fits the rule, and it does because everything fits that rule, it goes to the next step.
-  Ultimately it should get to a service, but if there is middleware declared, that middleware goes first,
-  and since middleware is there, and it is some redirect scheme, it never reaches any service,
-  it gets redirected using https scheme, which I guess is stating - go for port 443.
 
-  Here is the full traefik compose, with dns challenge labels from previous chapter included:
+요약하자면, 포트 80에서 요청이 들어오면 해당 엔트리포인트에서 수신 대기 중인 라우터가 이를 확인합니다.
+규칙에 맞고 모든 것이 규칙에 맞으면 다음 단계로 넘어갑니다.
+궁극적으로는 서비스에 도달해야 하지만 선언된 미들웨어가 있으면 해당 미들웨어가 먼저 도달합니다,
+미들웨어가 있고 리디렉션 방식이기 때문에 어떤 서비스에도 도달하지 않습니다,
+를 입력하면 포트 443으로 이동하라는 메시지가 표시되는 https 체계를 사용하여 리디렉션됩니다.
+
+
+다음은 이전 장의 DNS 챌린지 레이블이 포함된 전체 트레픽 구성입니다:
     
   `traefik-docker-compose.yml`
   ```
@@ -1000,9 +1006,10 @@ For cloudflare variables are
         name: $DEFAULT_NETWORK
   ```
 
-- **run the damn containers** and now `http://whoami.whateverblablabla.org` is immediately changed to `https://whoami.whateverblablabla.org`
+- **그 망할 컨테이너를 실행하고 이제 `http://whoami.whateverblablabla.org`가 즉시 `https://whoami.whateverblablabla.org`로 변경됩니다.
 
-# #stuff to checkout
-  - [when file provider is used for managing docker containers](https://github.com/pamendoz/personalDockerCompose)
-  - [traefik v2 forums](https://community.containo.us/c/traefik/traefik-v2)
-  - ['traefik official site blog](https://containo.us/blog/)
+
+# #결제할 내용
+- [파일 공급자가 도커 컨테이너를 관리하는 데 사용되는 경우]https://github.com/pamendoz/personalDockerCompose)
+- [traefik v2 포럼](https://community.containo.us/c/traefik/traefik-v2)
+- ['traefik 공식 사이트 블로그](https://containo.us/blog/)
