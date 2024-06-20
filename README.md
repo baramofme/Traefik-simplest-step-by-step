@@ -428,44 +428,48 @@ Example of an authentication middleware for any container.
     `docker-compose -f whoami-docker-compose.yml up -d`</br>
     `docker-compose -f nginx-docker-compose.yml up -d`</br>
 
-# #4 let's encrypt certificate, HTTP challenge
+# #4 let's encrypt certificate, HTTP 도전 과제
 
 ![letsencrypt-http-challenge-pic](https://i.imgur.com/yTshxC9.png)
 
-  My understanding of the process, simplified.
 
-  `LE` - Let's Encrypt. A service that gives out free certificates</br>
-  `Certificate` - a cryptographic key stored in a file on the server,
-   allows encrypted communication and confirms the identity</br>
-  `ACME` - a protocol(precisely agreed way of communication) to negotiate certificates
-  from LE. It is part of traefik.</br>
-  `DNS` - servers on the internet, translate domain names in to ip address</br>
-
-  Traefik uses ACME to ask LE for a certificate for a specific domain, like `whateverblablabla.org`.
-  LE answers with some random generated text that traefik puts at a specific place on the server.
-  LE then asks DNS internet servers for `whateverblablabla.org` and that points to some IP address.
-  LE looks at that IP address through ports 80/443 for the file containing that random text.
-
-  If it's there then this proves that whoever asked for the certificate controls both
-  the server and the domain, since it showed control over DNS records.
-  Certificate is given and is valid for 3 months, traefik will automatically try to renew
-  when less than 30 days is remaining.
-
-  Now how to actually get it done.
+프로세스에 대한 이해가 단순해졌습니다.
 
 
-- **create an empty acme.json file with 600 permissions**
+`LE` - Let's Encrypt. 무료 인증서를 제공하는 서비스</br>
+`인증서` - 서버의 파일에 저장된 암호화 키입니다,
+암호화 통신을 허용하고 신원을 확인합니다< /br> .
+`ACME` - 인증서를 협상하기 위한 프로토콜(정확하게 합의된 통신 방식)
+에서. traefik의 일부입니다.</br>
+`DNS` - 인터넷의 서버, 도메인 이름을 IP 주소로 변환</br>
 
-  This file will store the certificates and all the info about them.
+Traefik은 ACME를 사용하여 `whateverblablabla.org`와 같은 특정 도메인에 대한 인증서를 LE에 요청합니다.
+LE는 트라픽이 서버의 특정 위치에 무작위로 생성한 텍스트로 응답합니다.
+그런 다음 LE는 DNS 인터넷 서버에 `whateverblablabla.org`가 어떤 IP 주소를 가리키고 있는지 요청합니다.
+LE는 포트 80/443을 통해 임의의 텍스트가 포함된 파일에서 해당 IP 주소를 찾습니다.
+
+인증서가 있다면 이는 인증서를 요청한 사람이 두 인증서를 모두 제어하고 있음을 증명합니다.
+서버와 도메인에 대한 제어권을 보여줬기 때문입니다.
+인증서가 제공되며 3개월 동안 유효하며, traefik은 자동으로 갱신을 시도합니다.
+남은 기간이 30일 미만인 경우
+
+
+이제 실제로 완료하는 방법을 알아보세요.
+
+
+- **600개의 권한이 있는 빈 acme.json 파일을 만듭니다**
+
+
+이 파일에는 인증서와 인증서에 대한 모든 정보가 저장됩니다.
 
   `touch acme.json && chmod 600 acme.json`
 
-- **add 443 entrypoint and certificate resolver to traefik.yml**</br>
+- **443 진입점 및 인증서 확인자를 TRAEFIK에 추가합니다.yml**</br>
 
-  In entrypoint section new entrypoint is added called websecure, port 443
-  
-  certificatesResolvers is a configuration section that tells traefik
-  how to use acme resolver to get certificates.
+
+엔트리포인트 섹션에 웹시큐어(포트 443)라는 새 엔트리포인트가 추가되었습니다.
+certificatesResolvers는 traefik에 다음을 알려주는 구성 섹션입니다.
+ACME 해결사를 사용하여 인증서를 받는 방법.
 
     ```
     certificatesResolvers:
@@ -478,15 +482,16 @@ Example of an authentication middleware for any container.
             entryPoint: web
     ```
 
-  - the name of the resolver is `lets-encr` and uses acme
-  - commented out staging caServer makes LE issue a staging certificate,
-    it is an invalid certificate and wont give green lock but has no limitations,
-    so it's good for testing. If it's working it will say issued by let's encrypt.
-  - Storage tells where to store given certificates - `acme.json`
-  - The email is where LE sends notification about certificates expiring
-  - httpChallenge is given an entrypoint, so acme does http challenge over port 80
+- 리졸버의 이름은 `lets-encr`이고 acme을 사용합니다.
+- 스테이징 caServer를 주석 처리하면 LE가 스테이징 인증서를 발급합니다,
+유효하지 않은 인증서이며 녹색 잠금을 제공하지 않지만 제한은 없습니다,
+따라서 테스트하기에 좋습니다. 작동하면 암호화하자에서 발행했다고 표시됩니다.
+- 저장소는 주어진 인증서를 저장할 위치를 알려줍니다 - `acme.json`
+- 이메일은 LE가 만료되는 인증서에 대한 알림을 보내는 곳입니다.
+- httpChallenge에 진입점이 주어지므로 acme는 포트 80을 통해 http 챌린지를 수행합니다.
 
-  That is all that is needed for acme
+
+이것이 최고를 위해 필요한 전부입니다.
 
     `traefik.yml`
     ```
@@ -519,9 +524,10 @@ Example of an authentication middleware for any container.
             entryPoint: web
     ```
 
-- **expose/map port 443 and mount acme.json in traefik-docker-compose.yml** 
+- **expose/map 포트 443 및 traefik-docker-compose.yml에 acme.json 마운트**
 
-  Notice that acme.json is **not** :ro - read only
+
+acme.json이 **not** :ro - 읽기 전용이라는 점에 유의하세요.
 
     `traefik-docker-compose.yml`
     ```
@@ -549,10 +555,10 @@ Example of an authentication middleware for any container.
           name: $DEFAULT_NETWORK
     ```
 
-- **add required labels to containers**</br>
-compared to just plain http from first chapter,
-it is just changing router's entryPoint from `web` to `websecure`
-and assigning certificate resolver named `lets-encr` to the existing router
+- **용기에 필수 레이블 추가**</br>
+첫 번째 장의 일반 HTTP와 비교해보십시오,
+라우터의 엔트리포인트를 `web에서 `로 변경하는 것뿐입니다. class="ͼ38">`에서 `websecure`로 변경하는 것입니다.
+라는 이름의 인증서 확인자를 기존 라우터에 할당합니다. `lets-encr`
 
     `whoami-docker-compose.yml`
     ```
