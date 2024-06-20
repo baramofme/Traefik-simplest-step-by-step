@@ -11,14 +11,14 @@
 
 챕터
 
-1. [traefik 라우팅에서 다양한 도커 컨테이너로](#1-다양한-도커-컨테이너로-라우팅하는-트레픽)
-2. [traefik 라우팅을 로컬 IP 주소로](#2-로컬-IP-주소로-traefik 을-라우팅)
+1. [traefik 라우팅에서 다양한 도커 컨테이너로](#1-다양한-도커-컨테이너로-traefik을-라우팅)
+2. [traefik 라우팅을 로컬 IP 주소로](#2-로컬-IP-주소로-traefik을-라우팅)
 3. [미들웨어](#3-미들웨어)
 4. [렛츠 암호화 인증서 HTTP 챌린지 하기](#4-렛츠-암호화-인증서-HTTP-챌린지-하기)
 5. [클라우드플레어에서 렛츠 암호화 인증서 DNS 챌린지 하기](#5-클라우드플레어에서-렛츠-암호화-인증서-DNS-챌린지-하기)
 6. [redirect HTTP 트래픽을 HTTPS로](#6-http-트래픽을-https로-리디렉션)
 
-# #1 다양한 도커 컨테이너로 라우팅하는 트레픽
+# #1 다양한 도커 컨테이너로 traefik을 라우팅
 
 ![traefik-dashboard-pic](https://i.imgur.com/5jKHJmm.png)
 
@@ -261,7 +261,7 @@ like [this](https://docs.traefik.io/getting-started/quick-start/): `command: --a
 *추가 정보 :*</br>
 를 사용하여 모든 컨테이너의 실행을 중지합니다: `docker stop $(docker ps -q)`
 
-# #2 로컬 IP 주소로 트래픽 라우팅
+# #2 로컬 IP 주소로 traefik을 라우팅
 
 
 URL이 도커 컨테이너가 아닌 다른 것을 목표로 해야 하는 경우.
@@ -784,7 +784,7 @@ acme.json이 **not** :ro - 읽기 전용이라는 점에 유의하세요.
       default:
         external:
           name: $DEFAULT_NETWORK
-    ```
+  ```
 
 - **컨테이너에 필수 레이블 추가**</br>
 첫 번째 장의 일반 HTTP와 비교하여
@@ -792,8 +792,9 @@ acme.json이 **not** :ro - 읽기 전용이라는 점에 유의하세요.
 <라우터에 할당된 `lets-encr`이라는 이름의 인증서 확인자
 - 인증서를 받을 기본 도메인을 정의하는 레이블입니다,
 여기서는 누가미.whateverblablabla.org이며, `.env` 파일에서 가져온 도메인 이름입니다.
-  `whoami-docker-compose.yml`
-  ```
+
+`whoami-docker-compose.yml`
+```
   version: "3.7"
 
   services:
