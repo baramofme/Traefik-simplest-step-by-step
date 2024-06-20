@@ -1,40 +1,43 @@
-# Traefik v2 </br>guide by examples
+# Traefik v2 </br>예시별 가이드
 
-requirements
+요구 사항
 
-- have docker running somewhere
-- have a domain `whateverblablabla.org`
-- use cloudflare to manage DNS of the domain
-- have 80/443 ports open
 
-chapters
+- 어딘가에서 도커가 실행 중입니다.
+- 도메인이 `whateverblablabla.org`인 경우
+- 클라우드플레어를 사용하여 도메인의 DNS를 관리합니다.
+- 80/443 포트가 열려 있습니다.
 
-1. [traefik routing to docker containers](#1-traefik-routing-to-various-docker-containers)
-2. [traefik routing to a local IP addresses](#2-traefik-routing-to-a-local-IP-addresses)
-3. [middlewares](#3-middlewares)
-4. [let's encrypt certificate HTTP challenge](#4-lets-encrypt-certificate-HTTP-challenge)
-5. [let's encrypt certificate DNS challenge](#5-lets-encrypt-certificate-DNS-challenge-on-cloudflare)
-6. [redirect HTTP traffic to HTTPS](#6-redirect-HTTP-traffic-to-HTTPS)
 
-# #1 traefik routing to various docker containers
+챕터
+
+1. [traefik 라우팅에서 도커 컨테이너로](#1-traefik-routing-to-various-docker-containers))
+2. [traefik 라우팅을 로컬 IP 주소로](#2-.traefik-routing-to-a-local-IP-addresses))
+3. [middlewares](#3-.미들웨어)
+4. [렛츠 암호화 인증서 HTTP 챌린지](#4-lets-encrypt-certificate-HTTP-challenge)
+5. [렛츠 암호화 인증서 DNS 챌린지](#5-lets-encrypt-certificate-DNS-challenge-on-cloudflare)
+6. [redirect HTTP 트래픽을 HTTPS로](#6-.redirect-HTTP-traffic-to-HTTPS))
+
+# #1 다양한 도커 컨테이너로 라우팅하는 트레픽
 
 ![traefik-dashboard-pic](https://i.imgur.com/5jKHJmm.png)
 
-- **create a new docker network** `docker network create traefik_net`.</br>
-  Traefik and the containers need to be on the same network.
-  Compose creates one automatically, but that fact is hidden and there is potential for a fuck up later on.
-  Better to just create own network and set it as default in every compose file.
+- **새 도커 네트워크 만들기** `도커 네트워크 만들기 traefik_net`.</br>
+Traefik과 컨테이너는 동일한 네트워크에 있어야 합니다.
+작성하면 자동으로 생성되지만 그 사실이 숨겨져 있어 나중에 문제가 발생할 가능성이 있습니다.
+자체 네트워크를 생성하고 모든 작성 파일에서 기본값으로 설정하는 것이 좋습니다.
 
-  *extra info:* use `docker network inspect traefik_net` to see containers connected to that network
+
+*추가 정보:* 해당 네트워크에 연결된 컨테이너를 보려면 `docker network inspect traefik_net`을 사용한다.
 
 - **create traefik.yml**</br>
-  This file contains so called static traefik configuration.</br>
-  In this basic example there is log level set, dashboard is enabled.
-  Entrypoint called `web` is defined at port 80. Docker provider is set and given docker socket</br>
-  Since exposedbydefault is set to false, a label `"traefik.enable=true"` will be needed
-  for containers that should be routed by traefik.</br>
-  This file will be passed to a docker container using bind mount,
-  this will be done when we get to docker-compose.yml for traefik.
+이 파일에는 소위 정적 트래픽 구성이 포함되어 있습니다.</br>
+이 기본 예제에서는 로그 수준이 설정되어 있고 대시보드가 활성화되어 있습니다.
+`web`이라는 진입점이 포트 80에 정의됩니다. 도커 공급자가 설정되고 도커 소켓</br>이 지정됩니다.
+exposedbydefault가 false로 설정되어 있으므로 `"traefik.enable=true"` 레이블이 필요하게 됩니다.
+를 통해 라우팅해야 하는 컨테이너의 경우.</br>
+이 파일은 바인드 마운트를 사용하여 도커 컨테이너로 전달됩니다,
+이 작업은 traefik의 docker-compose.yml로 이동하면 완료됩니다.
 
     `traefik.yml`
     ```
@@ -56,19 +59,19 @@ chapters
         exposedByDefault: false
     ```
 
-  later on when traefik container is running, use command `docker logs traefik` 
-  and check if there is a notice stating: `"Configuration loaded from file: /traefik.yml"`.
-  You don't want to be the moron who makes changes to traefik.yml
-  and it does nothing because the file is not actually being used.
+나중에 traefik 컨테이너가 실행 중일 때 `docker logs traefik` 명령을 사용합니다.
+을 클릭하고 다음과 같은 알림이 있는지 확인합니다: `"파일에서 구성을 로드했습니다: /traefik.yml"`.
+traefik.yml을 변경하는 바보가 되고 싶지 않으세요?
+파일이 실제로 사용되지 않기 때문에 아무것도 하지 않습니다.
 
-- **create `.env`** file that will contain environmental variables.</br>
-  Domain names, api keys, ip addresses, passwords,... 
-  whatever is specific for one case and different for another, all of that ideally goes here.
-  These variables will be available for docker-compose when running
-  the `docker-compose up` command.</br>
-  This allows compose files to be moved from system to system more freely and changes are done to the .env file,
-  so there's a smaller possibility for a fuckup of forgetting to change domain name
-  in some host rule in a big ass compose file or some such.
+- **생성 `.환경 변수를 포함하는 `** 파일을 만듭니다.</br>
+도메인 이름, API 키, IP 주소, 비밀번호,...
+어떤 경우에는 특정하고 다른 경우에는 다른 것이 무엇이든, 모든 것이 여기에 이상적으로 들어갑니다.
+다음 변수는 docker-compose를 실행할 때 사용할 수 있습니다.
+`docker-compose up` 명령입니다.</br>
+이렇게 하면 작성 파일을 시스템 간에 더 자유롭게 이동하고 .env 파일을 변경할 수 있습니다,
+따라서 도메인 이름 변경을 잊어버리는 실수가 발생할 가능성이 적습니다.
+를 호스트 규칙에 추가할 수 있습니다.
 
     `.env`
     ```
@@ -76,19 +79,20 @@ chapters
     DEFAULT_NETWORK=traefik_net
     ```
 
-  *extra info:*</br>
-  command `docker-compose config` shows how compose will look
-  with the variables filled in.
-  Also entering container with `docker container exec -it traefik sh`
-  and then `printenv` can be useful.
 
-- **create traefik-docker-compose.yml file**.</br>
-  It's a simple typical compose file.</br>
-  Port 80 is mapped since we want traefik to be in charge of what comes on it - using it as an entrypoint.
-  Port 8080 is for dashboard where traefik shows info. Mount of docker.sock is needed,
-  so it can actually do its job interacting with docker.
-  Mount of `traefik.yml` is what gives the static traefik configuration.
-  The default network is set to the one created in the first step, as it will be set in all other compose files.
+*추가 정보 :*</br>
+명령 `docker-compose config`은 컴포짓이 어떻게 표시되는지 보여준다.
+변수를 채워 넣습니다.
+또한 `docker container exec -it traefik sh`로 컨테이너를 입력합니다.
+를 입력한 다음 `printenv`를 사용하면 유용할 수 있습니다.
+
+- **create traefik-docker-compose.yml 파일**.</br>
+간단한 일반적인 작성 파일입니다.</br>
+포트 80을 매핑한 이유는 이 포트를 엔트리 포인트로 사용하여 트래픽을 처리하도록 하기 위해서입니다.
+포트 8080은 traefik이 정보를 표시하는 대시보드용입니다. docker.sock의 마운트가 필요합니다,
+를 사용하여 실제로 도커와 상호 작용할 수 있도록 합니다.
+`traefik.yml`의 마운트는 정적 traefik 구성을 제공합니다.
+기본 네트워크는 다른 모든 작성 파일에서 설정되므로 첫 번째 단계에서 만든 네트워크로 설정됩니다.
 
     `traefik-docker-compose.yml`
     ```
@@ -113,45 +117,48 @@ chapters
     ```
 
 - **run traefik-docker-compose.yml**</br>
-  `docker-compose -f traefik-docker-compose.yml up -d` will start the traefik container.
+`docker-compose -f traefik-docker-compose.yml up -d`하면 traefik 컨테이너가 시작됩니다.
 
-  traefik is running, you can check it at the ip:8080 where you get the dashboard.</br>
-  Can also check out logs with `docker logs traefik`.
 
-  *extra info:*</br>
-  Typically you see guides having just a single compose file called `docker-compose.yml`
-  with several services/containers in it. Then it's just `docker-compose up -d` to start it all.
-  You don't even need to bother defining networks when it is all one compose.
-  But this time I prefer small and separate steps when learning new shit.
-  So that's why going with custom named docker-compose files as it allows easier separation.
+트래픽이 실행 중이면 대시보드가 표시되는 IP:8080에서 확인할 수 있습니다.< /br>
+`docker logs traefik`으로 로그를 확인할 수도 있습니다.
 
-  *extra info2:*</br>
-  What you can also see in tutorials is no mention of traefik.yml
-  and stuff is just passed from docker-compose using traefik's commands or labels.</br>
-  like [this](https://docs.traefik.io/getting-started/quick-start/): `command: --api.insecure=true --providers.docker`</br>
-  But that way compose files look bit more messy and you still can't do everything from there,
-  you still sometimes need that damn traefik.yml.</br>
-  So... for now, going with nicely structured readable traefik.yml
 
-- **add labels to containers that traefik should route**.</br>
-  Here are examples of whoami, nginx, apache, portainer.</br>
+*추가 정보 :*</br>
+일반적으로 가이드에는 `docker-compose.yml`이라는 하나의 작성 파일만 있는 것을 볼 수 있습니다.
+를 여러 개의 서비스/컨테이너와 함께 생성합니다. 그런 다음 `docker-compose up -d`로 모든 것을 시작하기만 하면 됩니다.
+하나의 컴포지션으로 네트워크를 정의할 수 있으므로 번거롭게 네트워크를 정의할 필요가 없습니다.
+하지만 이번에는 새로운 것을 배울 때 작고 개별적인 단계를 선호합니다.
+그렇기 때문에 사용자 지정 이름이 지정된 도커 컴포즈 파일을 사용하면 쉽게 분리할 수 있습니다.
+
+*추가 정보2:*</br>
+튜토리얼에서도 traefik.yml에 대한 언급이 없는 것을 볼 수 있습니다.
+그리고 트래픽의 명령이나 레이블을 사용하여 도커-컴포즈에서 물건을 전달합니다.</br>
+like [this](https://docs.traefik.io/getting-started/quick-start/): `command: --api.insecure=true --providers.docker`</br>
+하지만 이렇게 하면 파일 구성이 조금 더 지저분해 보이고 거기서 모든 작업을 수행할 수 없습니다,
+여전히 가끔은 그 빌어먹을 traefik.yml.</br>이 필요합니다.
+그래서... 지금은 가독성이 좋은 멋진 구조의 traefik.yml을 사용하기로 했습니다.
+
+
+- **트레픽이 라우팅해야 하는 컨테이너에 레이블 추가**.</br>
+다음은 누가미, nginx, 아파치, 포테이너의 예시입니다.</br>
 
   > \- "traefik.enable=true"
 
-  enables traefik
+트래픽 활성화
 
   > \- "traefik.http.routers.whoami.entrypoints=web"
 
-  defines router named `whoami` that listens on entrypoint web(port 80)
+엔트리포인트 웹(포트 80)에서 수신하는 `whoami`라는 라우터를 정의합니다.
 
   > \- "traefik.http.routers.whoami.rule=Host(`whoami.$MY_DOMAIN`)"
 
-  defines a rule for this `whoami` router, specifically that when url
-  equals `whoami.whateverblablabla.org` (the domain name comes from the `.env` file),
-  that it means for router to do its job and route it to a service.
+는 이 `whoami` 라우터에 대한 규칙을 정의합니다.
+는 `whoami.whateverblablabla.org`(도메인 이름은 `.env` 파일에서 유래함)입니다,
+라우터가 작업을 수행하여 서비스로 라우팅하는 것을 의미합니다.
   
-  Nothing else is needed, traefik knows the rest from the fact that these labels
-  are coming from context of a docker container.
+다른 것은 필요하지 않습니다. traefik은 이러한 레이블을 통해 나머지를 알고 있습니다.
+는 도커 컨테이너의 컨텍스트에서 제공됩니다.
 
   `whoami-docker-compose.yml`
   ```
@@ -240,17 +247,19 @@ chapters
 
   ```
 
-- **run the damn containers**</br>
-  ignore some orphans talk, it's cuz these compose files are in the same directory
-  and compose uses parent directory name for name of compose project
+
+- **그 망할 컨테이너를 실행하세요**</br>
+고아 얘기는 무시하세요. 왜냐하면 이 작성 파일들이 같은 디렉토리에 있기 때문입니다.
+그리고 작성은 작성 프로젝트의 이름으로 상위 디렉터리 이름을 사용합니다.
 
     `docker-compose -f whoami-docker-compose.yml up -d`</br>
     `docker-compose -f nginx-docker-compose.yml up -d`</br>
     `docker-compose -f apache-docker-compose.yml up -d`</br>
     `docker-compose -f portainer-docker-compose.yml up -d`
 
-  *extra info:*</br>
-  to stop all containers running: `docker stop $(docker ps -q)`
+
+*추가 정보 :*</br>
+를 사용하여 모든 컨테이너의 실행을 중지합니다: `docker stop $(docker ps -q)`
 
 # #2 로컬 IP 주소로 트래픽 라우팅
 
