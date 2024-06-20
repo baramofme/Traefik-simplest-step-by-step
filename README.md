@@ -252,28 +252,31 @@ chapters
   *extra info:*</br>
   to stop all containers running: `docker stop $(docker ps -q)`
 
-# #2 traefik routing to a local IP addresses
+# #2 로컬 IP 주소로 트래픽 라우팅
 
-  When url should aim at something other than a docker container.
 
-  ![simple-network-diagram-pic](https://i.imgur.com/lTpUvWJ.png)
+URL이 도커 컨테이너가 아닌 다른 것을 목표로 해야 하는 경우.
 
-- **define a file provider, add required routing and service**
+
+![simple-network-diagram-pic](https://i.imgur.com/lTpUvWJ.png)
+
+
+- **파일 공급자 정의, 필수 라우팅 및 서비스 추가**
   
-  What is needed is a router that catches some url and route it to some IP.</br>
-  Previous examples shown how to catch whatever url, on port 80,
-  but no one told it what to do when something fits the rule.
-  Traefik just knew since it was all done using labels in the context of a container and
-  thanks to docker being set as a provider in `traefik.yml`.</br>
-  For this "sending traffic at some IP" a traefik service is needed,
-  and to define traefik service a new provider is required, a file provider - just a fucking stupid
-  file that tells traefik what to do.</br>
-  Somewhat common is to set `traefik.yml` itself as a file provider so thats what will be done.</br>
-  Under providers theres a new `file` section and `traefik.yml` itself is set.</br>
-  Then dynamic configuration stuff is added.</br>
-  A router named `route-to-local-ip` with a simple subdomain hostname rule.
-  What fits that rule, in this case exact url `test.whateverblablabla.org`,
-  is send to the loadbalancer service which just routes it a specific IP and specific port.
+필요한 것은 일부 URL을 포착하여 일부 IP로 라우팅하는 라우터입니다.</br>
+이전 예제에서는 포트 80에서 어떤 URL을 잡는 방법을 보여주었습니다,
+하지만 아무도 규칙에 맞는 일이 발생했을 때 어떻게 해야 하는지 알려주지 않았습니다.
+Traefik은 컨테이너의 컨텍스트에서 레이블을 사용하여 모든 작업을 수행했기 때문에 알고 있었습니다.
+`traefik.yml`에서 도커를 공급자로 설정한 덕분입니다.</br
+이 '특정 IP에서 트래픽 전송'을 위해서는 Traefik 서비스가 필요합니다,
+그리고 트라픽 서비스를 정의하려면 새로운 제공자, 즉 파일 제공자가 필요합니다.
+파일에 트래픽이 수행해야 할 작업을 알려줍니다.</br>
+`traefik을 설정하는 것이 다소 일반적입니다.yml` 자체를 파일 공급자로 설정하는 것입니다.</br>
+공급자 아래에는 새로운 `파일` 섹션과 `traefik이 있습니다.yml` 자체가 설정됩니다.</br>
+그런 다음 동적 구성 항목이 추가됩니다.</br>
+간단한 하위 도메인 호스트 이름 규칙이 있는 `route-to-local-ip`라는 라우터입니다.
+이 경우 정확한 URL `test.whateverblablabla.org`이 해당 규칙에 맞습니다,
+를 로드밸런서 서비스로 보내면 특정 IP와 특정 포트로만 라우팅합니다.
 
     `traefik.yml`
     ```
@@ -313,28 +316,32 @@ chapters
               - url: "http://10.0.19.5:80"
     ```
 
-  Priority of the router is set to 1000, a very high value,
-  beating any possible other routers,
-  like one we use later for doing global http -> https redirect.
+라우터의 우선 순위는 매우 높은 값인 1000으로 설정되어 있습니다,
+다른 모든 라우터를 능가합니다,
+나중에 글로벌 http -> https 리디렉션을 수행하는 데 사용하는 것과 같은 것입니다.
 
-  *extra info:*</br>
-  Unfortunately the `.env` variables are not working here,
-  otherwise domain name in host rule and that IP would come from a variables.
-  So heads up that you will definitely forget to change these. 
 
-- **run traefik-docker-compose** and test if it works
+*추가 정보 :*</br>
+안타깝게도 `.env` 변수는 여기서 작동하지 않습니다,
+그렇지 않으면 호스트 규칙의 도메인 이름과 해당 IP가 변수로 사용됩니다.
+따라서 변경하는 것을 잊어버릴 수 있으니 주의하세요.
+
+
+- **run traefik-docker-compose** 그리고 작동하는지 테스트합니다.
 
     `docker-compose -f traefik-docker-compose.yml up -d`</br>
     
 # #3 middlewares
 
-Example of an authentication middleware for any container.
+모든 컨테이너에 대한 인증 미들웨어의 예입니다.
+
 
 ![logic-pic](https://i.imgur.com/QkfPYel.png)
 
-- **create a new file - `users_credentials`** containing username:passwords pairs,
- [htpasswd](https://www.htaccesstools.com/htpasswd-generator/) style</br>
- Bellow example has password `krakatoa` set to all 3 accounts
+
+- **새 파일 만들기 - -사용자 자격증명사용자 자격증명-`users_credentials`** 사용자명이 포함된 파일입니다:비밀번호 쌍을 포함합니다,
+[htpasswd](https://www.htaccesstools.com/htpasswd-generator/) style</br>
+아래 예시는 3개의 계정 모두에 비밀번호 `krakatoa`가 설정되어 있습니다.
 
     `users_credentials`
     ```
@@ -368,15 +375,16 @@ Example of an authentication middleware for any container.
           name: $DEFAULT_NETWORK
     ```
 
-- **add two labels to any container** that should have authentication</br>
-  - The first label attaches new middleware called `auth-middleware`
-    to an already existing `whoami` router.
-  - The second label gives this middleware type basicauth,
-    and tells it where is the file it should use to authenticate users.
+- **인증이 있어야 하는 컨테이너에 두 개의 레이블을 추가합니다</br>
+- 첫 번째 레이블은 `auth-middleware`라는 새 미들웨어를 첨부합니다.
+를 이미 존재하는 `whoami` 라우터에 추가합니다.
+- 두 번째 레이블은 이 미들웨어 유형에 기본값을 부여합니다,
+를 호출하여 사용자 인증에 사용할 파일이 어디에 있는지 알려줍니다.
 
-    No need to mount the `users_credentials` here, it's traefik that needs that file
-    and these labels are a way to pass info to traefik, what it should do
-    in context of containers.
+
+여기에 `users_credentials` 파일을 마운트할 필요가 없으며, 해당 파일이 필요한 것은 traefik입니다.
+그리고 이 레이블은 TRAEFIK에 정보를 전달하는 방법입니다.
+컨테이너의 컨텍스트에서.
 
   `whoami-docker-compose.yml`
   ```
@@ -422,7 +430,7 @@ Example of an authentication middleware for any container.
         name: $DEFAULT_NETWORK
   ```
 
-- **run the damn containers** and now there is login and password needed
+- **이 망할 컨테이너를 실행하면 이제 로그인과 비밀번호가 필요합니다.
 
     `docker-compose -f traefik-docker-compose.yml up -d`</br>
     `docker-compose -f whoami-docker-compose.yml up -d`</br>
