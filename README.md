@@ -11,12 +11,12 @@
 
 챕터
 
-1. [traefik 라우팅에서 도커 컨테이너로](#1-traefik-routing-to-various-docker-containers))
-2. [traefik 라우팅을 로컬 IP 주소로](#2-.traefik-routing-to-a-local-IP-addresses))
-3. [middlewares](#3-.미들웨어)
-4. [렛츠 암호화 인증서 HTTP 챌린지](#4-lets-encrypt-certificate-HTTP-challenge)
-5. [렛츠 암호화 인증서 DNS 챌린지](#5-lets-encrypt-certificate-DNS-challenge-on-cloudflare)
-6. [redirect HTTP 트래픽을 HTTPS로](#6-.redirect-HTTP-traffic-to-HTTPS))
+1. [traefik 라우팅에서 도커 컨테이너로](#1-다양한-도커-컨테이너로-라우팅하는-트레픽)
+2. [traefik 라우팅을 로컬 IP 주소로](#2-로컬-IP-주소로-트래픽-라우팅)
+3. [middlewares](#3-미들웨어)
+4. [렛츠 암호화 인증서 HTTP 챌린지](#4-lets-encrypt-인증서-HTTP-챌린지-하기)
+5. [렛츠 암호화 인증서 DNS 챌린지](#5-클라우드플레어에서-lets-encrypt-인증서-DNS-챌린지-하기)
+6. [redirect HTTP 트래픽을 HTTPS로](#6-http-트래픽을-https로-리디렉션)
 
 # #1 다양한 도커 컨테이너로 라우팅하는 트레픽
 
@@ -340,7 +340,7 @@ Traefik은 컨테이너의 컨텍스트에서 레이블을 사용하여 모든 �
 
     `docker-compose -f traefik-docker-compose.yml up -d`</br>
     
-# #3 middlewares
+# #3 미들웨어
 
 모든 컨테이너에 대한 인증 미들웨어의 예입니다.
 
@@ -445,7 +445,7 @@ Traefik은 컨테이너의 컨텍스트에서 레이블을 사용하여 모든 �
     `docker-compose -f whoami-docker-compose.yml up -d`</br>
     `docker-compose -f nginx-docker-compose.yml up -d`</br>
 
-# #4 let's encrypt certificate, HTTP 도전 과제
+# #4 lets encrypt 인증서 HTTP 챌린지 하기
 
 ![letsencrypt-http-challenge-pic](https://i.imgur.com/yTshxC9.png)
 
@@ -626,7 +626,8 @@ acme.json이 **not** :ro - 읽기 전용이라는 점에 유의하세요.
 *추가 정보 :*</br>
 acme.json의 내용 확인</br>
 새로 시작하려면 acme.json을 삭제하세요.
-# #5 클라우드플레어에서 인증서 DNS 챌린지를 암호화하자
+
+# #5 클라우드플레어에서 lets encrypt 인증서 DNS 챌린지 하기
 
 ![letsencrypt-dns-challenge-pic](https://i.imgur.com/dkgxFTR.png)
 
