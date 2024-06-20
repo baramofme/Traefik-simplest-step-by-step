@@ -445,7 +445,7 @@ Traefik은 컨테이너의 컨텍스트에서 레이블을 사용하여 모든 �
     `docker-compose -f whoami-docker-compose.yml up -d`</br>
     `docker-compose -f nginx-docker-compose.yml up -d`</br>
 
-# #4 lets encrypt 인증서 HTTP 챌린지 하기
+# #4 렛츠 암호화 인증서 HTTP 챌린지 하기
 
 ![letsencrypt-http-challenge-pic](https://i.imgur.com/yTshxC9.png)
 
@@ -627,7 +627,7 @@ acme.json이 **not** :ro - 읽기 전용이라는 점에 유의하세요.
 acme.json의 내용 확인</br>
 새로 시작하려면 acme.json을 삭제하세요.
 
-# #5 클라우드플레어에서 lets encrypt 인증서 DNS 챌린지 하기
+# #5 클라우드플레어에서 렛츠 암호화 인증서 DNS 챌린지 하기
 
 ![letsencrypt-dns-challenge-pic](https://i.imgur.com/dkgxFTR.png)
 
