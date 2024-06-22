@@ -20,6 +20,7 @@
 
 # #1 다양한 도커 컨테이너로 traefik을 라우팅
 
+![from-request-to-docker-container-with-traefik](https://doc.traefik.io/traefik/assets/img/providers/docker.png)
 ![traefik-dashboard-pic](https://i.imgur.com/5jKHJmm.png)
 
 - **새 도커 네트워크 만들기** `docker network create  traefik_net`.</br>
