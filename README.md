@@ -33,7 +33,7 @@
 - **create traefik.yml**</br>
   이 파일에는 소위 정적 traefik 구성이 포함되어 있습니다.</br>
   이 기본 예제에서는 로그 수준이 설정되어 있고 대시보드가 활성화되어 있습니다.
-  `web`이라는 진입점이 포트 80에 정의됩니다. 도커 공급자가 설정되고 도커 소켓</br>이 지정됩니다.
+  `web`이라는 진입점(엔트리포인트)이 포트 80에 정의됩니다. 도커 공급자가 설정되고 도커 소켓</br>이 지정됩니다.
   exposedbydefault가 false로 설정되어 있으므로 traefik 을 통해 라우팅해야 하는 컨테이너의 경우 `"traefik.enable=true"` 레이블이 필요하게 됩니다.</br>
   이 파일은 바인드 마운트를 사용하여 도커 컨테이너로 전달됩니다,
   이 작업은 traefik의 docker-compose.yml로 이동하면 완료됩니다.
@@ -125,11 +125,11 @@
   일반적으로 가이드에는 `docker-compose.yml`이라는 하나의 작성(compose) 파일에 여러 개의 서비스/컨테이너와 함께 생성합니다. 그런 다음 `docker-compose up -d`로 모든 것을 시작하기만 하면 됩니다.
   하나의 컴포지션으로 네트워크를 정의할 수 있으므로 번거롭게 네트워크를 정의할 필요가 없습니다.
   하지만 이번에는 새로운 것을 배울 때 작고 개별적인 단계를 선호합니다.
-  그렇기 때문에 사용자 지정 이름이 지정된 도커 컴포즈 파일을 사용하면 쉽게 분리할 수 있습니다.
+  그렇기 때문에 사용자 지정 이름이 지정된 도커 작성(compose) 파일을 사용하면 쉽게 분리할 수 있습니다.
 
   *추가 정보2:*</br>
   튜토리얼에서도 traefik.yml에 대한 언급이 없는 것을 볼 수 있습니다.
-  그리고 traefik의 명령(command)이나 레이블(label)을 사용하여 도커-컴포즈에서 물건을 전달합니다.</br>
+  그리고 traefik의 명령(command)이나 레이블(label)을 사용하여 도커-작성(compose)에서 물건을 전달합니다.</br>
   [여기서](https://docs.traefik.io/getting-started/quick-start/) 처럼요. : `command: --api.insecure=true --providers.docker`</br>
   하지만 이렇게 하면 파일 구성이 조금 더 지저분해 보이고 거기서 모든 작업을 수행할 수 없습니다,
   여전히 가끔은 그 빌어먹을 traefik.yml.</br>이 필요합니다.
@@ -145,7 +145,7 @@
 
   > \- "traefik.http.routers.whoami.entrypoints=web"
 
-  진입점 웹(포트 80)에서 수신하는 `whoami`라는 라우터를 정의합니다.
+  진입점(엔트리포인트) 웹(포트 80)에서 수신하는 `whoami`라는 라우터를 정의합니다.
 
   > \- "traefik.http.routers.whoami.rule=Host(`whoami.$MY_DOMAIN`)"
 
@@ -462,9 +462,9 @@ LE 에서. traefik의 일부입니다.</br>
 
   `touch acme.json && chmod 600 acme.json`
 
-- **443 진입점 및 인증서 확인자(리졸버)를 TRAEFIK에 추가합니다.yml**</br>
+- **443 진입점(엔트리포인트) 및 인증서 확인자(리졸버)를 TRAEFIK에 추가합니다.yml**</br>
 
-  진입점 섹션에 웹시큐어라는 새로운 진입점이 추가되고 포트 443 인증서 확인자(리졸버)는 traefik에 acme 확인자(리졸버)를 사용하여 인증서를 가져오는 방법을 알려주는 구성 섹션입니다.
+  진입점(엔트리포인트) 섹션에 웹시큐어라는 새로운 진입점(엔트리포인트)이 추가되고 포트 443 인증서 확인자(리졸버)는 traefik에 acme 확인자(리졸버)를 사용하여 인증서를 가져오는 방법을 알려주는 구성 섹션입니다.
 
     ```
     certificatesResolvers:
@@ -483,7 +483,7 @@ LE 에서. traefik의 일부입니다.</br>
 따라서 테스트하기에 좋습니다. 작동하면 암호화하자에서 발행했다고 표시됩니다.
   - 저장소는 주어진 인증서를 저장할 위치를 알려줍니다 - `acme.json`
   - 이메일은 LE가 만료되는 인증서에 대한 알림을 보내는 곳입니다.
-  - httpChallenge에 진입점이 주어지므로 acme는 포트 80을 통해 http 챌린지를 수행합니다.
+  - httpChallenge에 진입점(엔트리포인트)이 주어지므로 acme는 포트 80을 통해 http 챌린지를 수행합니다.
 
 
   이것이 acme를 위해 필요한 전부입니다.
@@ -551,7 +551,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
 - **컨테이너에 필수 레이블 추가**</br>
 첫 번째 장의 일반 HTTP와 비교해보십시오,
-라우터의 진입점를 `web`에서 `websecure`로 변경하는 것입니다. 그리고 `lets-encr`라는 이름의 인증서 확인자(리졸버)를 기존 라우터에 할당합니다. 
+라우터의 진입점(엔트리포인트)를 `web`에서 `websecure`로 변경하는 것입니다. 그리고 `lets-encr`라는 이름의 인증서 확인자(리졸버)를 기존 라우터에 할당합니다. 
 
     `whoami-docker-compose.yml`
     ```
@@ -645,9 +645,9 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 `touch acme.json && chmod 600 acme.json`
 
 
-- **443 진입점 및 인증서 확인자(리졸버)를 traefik.yml에 추가합니다**</br>
+- **443 진입점(엔트리포인트) 및 인증서 확인자(리졸버)를 traefik.yml에 추가합니다**</br>
 
-  엔트리포인트 섹션에 웹시큐어, 포트 443 인증서 확인자(리졸버)라는 새로운 엔트리포인트가 추가되었습니다.</br> 인증서를 얻기 위해 acme 확인자(리졸버)를 사용하는 방법을 traefik에 알려주는 구성 섹션입니다.
+  진입점(엔트리포인트) 섹션에 웹시큐어, 포트 443 인증서 확인자(리졸버)라는 새로운 진입점(엔트리포인트)가 추가되었습니다.</br> 인증서를 얻기 위해 acme 확인자(리졸버)를 사용하는 방법을 traefik에 알려주는 구성 섹션입니다.
 
     ```
     certificatesResolvers:
@@ -754,7 +754,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
 - **컨테이너에 필수 레이블 추가**</br>
   첫 번째 장의 일반 HTTP와 비교하여
-  - 라우터의 진입점이 `web`에서 `websecure`로 전환됩니다.
+  - 라우터의 진입점(엔트리포인트)이 `web`에서 `websecure`로 전환됩니다.
   - 라우터에 할당된 `lets-encr`이라는 이름의 인증서 확인자(리졸버)
   - 인증을 받을 주 도메인의 레이블을 정의하기, 이 안에서서는 whoami.whateverblablabla.org 이다, 그리고 도메인 이름은 `.env` 에서 가져온다.
  
@@ -809,14 +809,11 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
 == 여기까지 작업함
 
-- **제길, DNS 챌린지의 핵심은 와일드카드를 얻는 것입니다!**</br>
-충분히 공정</br>
-따라서 와일드카드의 경우 이 레이블은 traefik 컴포지션에 들어갑니다.
-- 이전과 동일한 `lets-encr` 인증자 해결사가 사용되며, traefik.yml에 정의된 것과 동일합니다.
-- 하위 도메인에 대한 와일드카드(*.whateverblablabla.org)가 인증서를 받을 기본 도메인으로 설정됩니다.
-- 네이키드 도메인(그냥 무엇이든블라블라.org)은 sans(제목 대체 이름)로 설정됩니다.
-다시 말하지만, `*.whateverblablabla.org` 및 `whateverblablabla.org`가 필요합니다.
-DNS 제어판에서 traefik의 IP를 가리키는 A 레코드로 설정합니다.
+- **제길, DNS 챌린지의 핵심은 와일드카드를 얻는 것입니다!** 공평하게도 와일드카드의 경우 이 레이블은 traefik 작성(compose)에 들어갑니다.
+- 이전과 동일한 `lets-encr` 인증자 확인자(리졸버)가 사용되며, traefik.yml에 정의된 것과 동일합니다.
+- 네이키드 도메인(그냥 무엇이든블라블라.org)에 대한 인증서를 받기 위한 기본 도메인으로 하위 도메인(*.무엇이든블라블라.org)의 와일드카드가 sans(제목 대체 이름)로 설정되어 있습니다.
+  
+  다시 말하지만, `*.whateverblablabla.org` 및 `whateverblablabla.org`를 traefik의 IP를 가리키는 A 레코드로 DNS 제어판에서 설정합니다.
 
   `traefik-docker-compose.yml`
   ```
@@ -850,9 +847,7 @@ DNS 제어판에서 traefik의 IP를 가리키는 A 레코드로 설정합니다
   ```
 
 
-이제 컨테이너를 하위 도메인으로 액세스하려는 경우,
-URL에 대한 규칙이 있는 일반 라우터만 있으면 됩니다,
-443 포트 진입점에 있어야 하며 동일한 `lets-encr` 인증서 확인자(리졸버)를 사용해야 합니다.
+  이제 컨테이너가 하위 도메인으로 액세스하려면 URL에 대한 규칙이 있고 443 포트 진입점(엔트리포인트)에 있어야 하며 동일한 `lets-encr` 인증서 확인자(리졸버)를 사용하는 일반 라우터만 있으면 됩니다.
 
     `whoami-docker-compose.yml`
     ```
@@ -896,7 +891,7 @@ URL에 대한 규칙이 있는 일반 라우터만 있으면 됩니다,
           name: $DEFAULT_NETWORK
     ```
 
-다음은 아파치이지만 이번에는 네이키드 도메인 `whateverblablabla.org`</br
+  다음은 아파치이지만 이번에는 네이키드 도메인 `whateverblablabla.org`에서 실행됩니다.
     
     `apache-docker-compose.yml`
     ```
@@ -921,54 +916,40 @@ URL에 대한 규칙이 있는 일반 라우터만 있으면 됩니다,
 
 # #6 http traefik을 https로 리디렉션
 
-
 ![padlocks-pic](https://i.imgur.com/twTDSym.png)
 
+  http(80)을 https(443)으로 리디렉션하는 것이 좋습니다.
+  Traefik에는 이를 위한 특별한 유형의 미들웨어인 redirectscheme이 있습니다.
 
-http(80)을 https(443)으로 리디렉션하는 것이 좋습니다.< /br>
-Traefik에는 이를 위한 특별한 유형의 미들웨어인 redirectscheme이 있습니다.
+  이 리디렉션을 선언할 수 있는 위치는 여러 곳이 있는데, `traefik.yml`, `traefik.yml` 자체가 파일 공급자로 설정된 경우 동적 섹션에서. 또는 실행 중인 컨테이너의 레이블을 사용하여 이 예제에서는 traefik 작성(compose)에서 이를 수행합니다.
 
-
-이 리디렉션을 선언할 수 있는 곳은 여러 곳이 있습니다,
-`traefik.yml`에서 동적 섹션에서 `traefik.yml` 자체가 파일 공급자로 설정됩니다.</br>
-또는 실행 중인 컨테이너에서 레이블을 사용하거나, 이 예제에서는 traefik 컴포즈에서 레이블을 사용합니다.
-
-
-- **트레픽 작성에서 레이블을 사용하여 새 라우터 및 리디렉션 체계를 추가**
+- **traefik 작성(compose)에서 레이블을 사용하여 새 라우터 및 리디렉션 체계(스키마)를 추가**
 
   >\- "traefik.enable=true"
 
-이 트라픽 컨테이너에서 트라픽을 활성화합니다,
-여기에는 서비스에 대한 일반적인 라우팅이 필요하지 않습니다,
-이 없으면 다른 레이블이 작동하지 않습니다.
+  이 traefik 컨테이너에서 traefik을 활성화합니다. 여기서 서비스에 대한 일반적인 라우팅이 필요하지는 않지만 다른 레이블은 이것이 없으면 작동하지 않습니다.
 
   >\- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
-라는 새 미들웨어를 생성합니다. `redirect-to-https`, "redirectscheme"을 입력합니다.
-를 지정하고 `https`.</br>.
-
+  `redirect-to-https`라는 새 미들웨어를 생성하고, "redirectscheme"을 입력하고 `https` 스키마를 할당합니다.
   >\- "traefik.http.routers.redirect-https.rule=hostregexp(`{host:.+}`)"
 
-는 다음과 같은 정규식 규칙을 사용하여 `redirect-https`라는 새 라우터를 생성합니다.
-모든 수신 요청을 포착합니다.
+  다음과 같은 정규식 규칙을 사용하여 모든 수신 요청을 포착하는 `redirect-https`라는 새 라우터를 생성합니다.
 
   >\- "traefik.http.routers.redirect-https.entrypoints=web"
 
-이 라우터가 수신 대기하는 진입점를 선언합니다 - 웹(포트 80) </br>
+  이 라우터가 수신 대기하는 진입점(엔트리포인트)를 선언합니다 - 웹(포트 80)
 
   >\- "traefik.http.routers.redirect-https.middlewares=redirect-to-https"
 
-는 새로 생성된 리디렉션스킴 미들웨어를 이 새로 생성된 라우터에 할당합니다.
+ 새로 생성된 redirectscheme 미들웨어를 이 새로 생성된 라우터에 할당합니다.
 
 
-요약하자면, 포트 80에서 요청이 들어오면 해당 진입점에서 수신 대기 중인 라우터가 이를 확인합니다.
-규칙에 맞고 모든 것이 규칙에 맞으면 다음 단계로 넘어갑니다.
-궁극적으로는 서비스에 도달해야 하지만 선언된 미들웨어가 있으면 해당 미들웨어가 먼저 도달합니다,
-미들웨어가 있고 리디렉션 방식이기 때문에 어떤 서비스에도 도달하지 않습니다,
-를 입력하면 포트 443으로 이동하라는 메시지가 표시되는 https 체계를 사용하여 리디렉션됩니다.
+  요약하자면, 포트 80에서 요청이 들어오면 해당 진입점(엔트리포인트)에서 수신 대기 중인 라우터가 이를 확인합니다.
+  규칙에 맞고 모든 것이 규칙에 맞으면 다음 단계로 넘어갑니다.
+  궁극적으로 서비스에 도달해야 하지만 선언된 미들웨어가 있으면 그 미들웨어가 먼저 가고, 미들웨어가 있고 리디렉션 체계가 있기 때문에 어떤 서비스에도 도달하지 않고, 포트 443으로 가라는 https 체계를 사용하여 리디렉션됩니다.
 
-
-다음은 이전 장의 DNS 챌린지 레이블이 포함된 전체 트레픽 구성입니다:
+ 다음은 이전 장의 DNS 챌린지 레이블이 포함된 전체 traefik 작성(compose)입니다:
     
   `traefik-docker-compose.yml`
   ```
@@ -1007,10 +988,10 @@ Traefik에는 이를 위한 특별한 유형의 미들웨어인 redirectscheme�
         name: $DEFAULT_NETWORK
   ```
 
-- **그 망할 컨테이너를 실행하고 이제 `http://whoami.whateverblablabla.org`가 즉시 `https://whoami.whateverblablabla.org`로 변경됩니다.
+- **그 망할 컨테이너를 실행**해, 그러면 이제 `http://whoami.whateverblablabla.org`가 즉시 `https://whoami.whateverblablabla.org`로 변경됩니다.
 
 
-# #결제할 내용
+# #확인할 내용
 - [파일 공급자가 도커 컨테이너를 관리하는 데 사용되는 경우]https://github.com/pamendoz/personalDockerCompose)
 - [traefik v2 포럼](https://community.containo.us/c/traefik/traefik-v2)
 - ['traefik 공식 사이트 블로그](https://containo.us/blog/)
