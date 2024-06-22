@@ -22,7 +22,7 @@
 
 ![traefik-dashboard-pic](https://i.imgur.com/5jKHJmm.png)
 
-- **새 도커 네트워크 만들기** `도커 네트워크 만들기 traefik_net`.</br>
+- **새 도커 네트워크 만들기** `docker network create  traefik_net`.</br>
   Traefik과 컨테이너는 동일한 네트워크에 있어야 합니다.
   작성하면 자동으로 생성되지만 그 사실이 숨겨져 있어 나중에 문제가 발생할 가능성이 있습니다.
   자체 네트워크를 생성하고 모든 작성 파일에서 기본값으로 설정하는 것이 좋습니다.
