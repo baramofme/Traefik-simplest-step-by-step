@@ -37,7 +37,7 @@
   `web`이라는 진입점(엔트리포인트)이 포트 80에 정의됩니다. 도커 공급자가 설정되고 도커 소켓</br>이 지정됩니다.
   exposedbydefault가 false로 설정되어 있으므로 traefik 을 통해 라우팅해야 하는 컨테이너의 경우 `"traefik.enable=true"` 레이블이 필요하게 됩니다.</br>
   이 파일은 바인드 마운트를 사용하여 도커 컨테이너로 전달됩니다,
-  이 작업은 traefik의 docker compose.yaml로 이동하면 완료됩니다.
+  이 작업은 traefik의 docker-compose.yaml로 이동하면 완료됩니다.
 
     `traefik.yaml`
     ```
@@ -85,7 +85,7 @@
   또한 `docker container exec -it traefik sh`로 컨테이너를 입력합니다.
   그리고 나서 `printenv`를 사용하면 유용할 수 있습니다.
 
-- **create traefik-docker compose.yaml 파일**.</br>
+- **create traefik-docker-compose.yaml 파일**.</br>
   간단한 일반적인 작성 파일입니다.</br>
   포트 80을 매핑한 이유는 이 포트를 엔트리 포인트로 사용하여 traefik을 처리하도록 하기 위해서입니다.
   포트 8080은 traefik이 정보를 표시하는 대시보드용입니다. docker.sock의 마운트가 필요합니다,
@@ -93,7 +93,7 @@
 `traefik.yaml`의 마운트는 정적 traefik 구성을 제공합니다.
   기본 네트워크는 다른 모든 작성 파일에서 설정되므로 첫 번째 단계에서 만든 네트워크로 설정됩니다.
 
-    `traefik-docker compose.yaml`
+    `traefik-docker-compose.yaml`
     ```
     version: "3.7"
 
@@ -115,15 +115,15 @@
           name: $DEFAULT_NETWORK
     ```
 
-- **traefik-docker compose.yaml 실행**</br>
-  `docker compose -f traefik-docker compose.yaml up -d`하면 traefik 컨테이너가 시작됩니다.
+- **traefik-docker-compose.yaml 실행**</br>
+  `docker compose -f traefik-docker-compose.yaml up -d`하면 traefik 컨테이너가 시작됩니다.
 
   traefik이 실행 중이면 대시보드가 표시되는 IP:8080에서 확인할 수 있습니다.< /br>
 `docker logs traefik`으로 로그를 확인할 수도 있습니다.
 
 
   *추가 정보 :*</br>
-  일반적으로 가이드에는 `docker compose.yaml`이라는 하나의 작성(compose) 파일에 여러 개의 서비스/컨테이너와 함께 생성합니다. 그런 다음 `docker compose up -d`로 모든 것을 시작하기만 하면 됩니다.
+  일반적으로 가이드에는 `docker-compose.yaml`이라는 하나의 작성(compose) 파일에 여러 개의 서비스/컨테이너와 함께 생성합니다. 그런 다음 `docker compose up -d`로 모든 것을 시작하기만 하면 됩니다.
   하나의 컴포지션으로 네트워크를 정의할 수 있으므로 번거롭게 네트워크를 정의할 필요가 없습니다.
   하지만 이번에는 새로운 것을 배울 때 작고 개별적인 단계를 선호합니다.
   그렇기 때문에 사용자 지정 이름이 지정된 도커 작성(compose) 파일을 사용하면 쉽게 분리할 수 있습니다.
@@ -155,7 +155,7 @@
   
 다른 것은 필요하지 않습니다. traefik은  도커 컨테이너의 컨텍스트에서 제공되는 이러한 레이블을 통해 나머지 할 일을 알고 있습니다.
 
-  `whoami-docker compose.yaml`
+  `whoami-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -175,7 +175,7 @@
         name: $DEFAULT_NETWORK
   ```
 
-  `nginx-docker compose.yaml`
+  `nginx-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -195,7 +195,7 @@
         name: $DEFAULT_NETWORK
   ```
 
-  `apache-docker compose.yaml`
+  `apache-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -215,7 +215,7 @@
         name: $DEFAULT_NETWORK
   ```
 
-  `portainer-docker compose.yaml`
+  `portainer-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -247,10 +247,10 @@
   고아 얘기는 무시하세요. 왜냐하면 이 작성(compose) 파일들이 같은 디렉토리에 있기 때문입니다.
   그리고 작성(compose)은 작성 프로젝트의 이름으로 상위 디렉터리 이름을 사용합니다.
 
-    `docker compose -f whoami-docker compose.yaml up -d`</br>
-    `docker compose -f nginx-docker compose.yaml up -d`</br>
-    `docker compose -f apache-docker compose.yaml up -d`</br>
-    `docker compose -f portainer-docker compose.yaml up -d`
+    `docker compose -f whoami-docker-compose.yaml up -d`</br>
+    `docker compose -f nginx-docker-compose.yaml up -d`</br>
+    `docker compose -f apache-docker-compose.yaml up -d`</br>
+    `docker compose -f portainer-docker-compose.yaml up -d`
 
 
   *추가 정보 :*</br>
@@ -330,7 +330,7 @@ URL이 도커 컨테이너가 아닌 다른 것을 목표로 해야 하는 경�
 
 - **traefik-docker compose 실행**하고 작동하는지 테스트합니다.
 
-    `docker compose -f traefik-docker compose.yaml up -d`</br>
+    `docker compose -f traefik-docker-compose.yaml up -d`</br>
     
 # #3 미들웨어
 
@@ -349,9 +349,9 @@ URL이 도커 컨테이너가 아닌 다른 것을 목표로 해야 하는 경�
     bastard:$apr1$gvhkVK.x$5rxoW.wkw1inm9ZIfB0zs1
     ```
 
-- **traefik-docker compose.yaml 에서 users_credentials 마운트 하기**
+- **traefik-docker-compose.yaml 에서 users_credentials 마운트 하기**
 
-    `traefik-docker compose.yaml`
+    `traefik-docker-compose.yaml`
     ```
     version: "3.7"
 
@@ -383,7 +383,7 @@ URL이 도커 컨테이너가 아닌 다른 것을 목표로 해야 하는 경�
 그리고 이 레이블은 TRAEFIK에 정보를 전달하는 방법입니다.
 컨테이너의 컨텍스트에서.
 
-  `whoami-docker compose.yaml`
+  `whoami-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -405,7 +405,7 @@ URL이 도커 컨테이너가 아닌 다른 것을 목표로 해야 하는 경�
         name: $DEFAULT_NETWORK
   ```
 
-  `nginx-docker compose.yaml`
+  `nginx-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -429,9 +429,9 @@ URL이 도커 컨테이너가 아닌 다른 것을 목표로 해야 하는 경�
 
 - **이 망할 컨테이너를 실행**하려면 이제 로그인과 비밀번호가 필요합니다.
 
-    `docker compose -f traefik-docker compose.yaml up -d`</br>
-    `docker compose -f whoami-docker compose.yaml up -d`</br>
-    `docker compose -f nginx-docker compose.yaml up -d`</br>
+    `docker compose -f traefik-docker-compose.yaml up -d`</br>
+    `docker compose -f whoami-docker-compose.yaml up -d`</br>
+    `docker compose -f nginx-docker-compose.yaml up -d`</br>
 
 # #4 렛츠 암호화 인증서 HTTP 챌린지 하기
 
@@ -520,11 +520,11 @@ LE 에서. traefik의 일부입니다.</br>
             entryPoint: web
     ```
 
-- **포트 443 노출/연결 및 traefik-docker compose.yaml에 acme.json 마운트**
+- **포트 443 노출/연결 및 traefik-docker-compose.yaml에 acme.json 마운트**
 
 acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
-    `traefik-docker compose.yaml`
+    `traefik-docker-compose.yaml`
     ```
     version: "3.7"
 
@@ -554,7 +554,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 첫 번째 장의 일반 HTTP와 비교해보십시오,
 라우터의 진입점(엔트리포인트)를 `web`에서 `websecure`로 변경하는 것입니다. 그리고 `lets-encr`라는 이름의 인증서 확인자(리졸버)를 기존 라우터에 할당합니다. 
 
-    `whoami-docker compose.yaml`
+    `whoami-docker-compose.yaml`
     ```
     version: "3.7"
 
@@ -575,7 +575,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
           name: $DEFAULT_NETWORK
     ```
 
-    `nginx-docker compose.yaml`
+    `nginx-docker-compose.yaml`
     ```
     version: "3.7"
 
@@ -722,12 +722,12 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
   CF_API_KEY=8d08c87dadb0f8f0e63efe84fb115b62e1abc
   ```
 
-- traefik-docker compose.yaml에 **포트 443 노출/연결 및 acme.json 마운트**를 추가합니다.
+- traefik-docker-compose.yaml에 **포트 443 노출/연결 및 acme.json 마운트**를 추가합니다.
 
 
 acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
-  `traefik-docker compose.yaml`
+  `traefik-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -759,7 +759,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
   - 라우터에 할당된 `lets-encr`이라는 이름의 인증서 확인자(리졸버)
   - 인증을 받을 주 도메인의 레이블을 정의하기, 이 안에서서는 whoami.whateverblablabla.org 이다, 그리고 도메인 이름은 `.env` 에서 가져온다.
  
-  `whoami-docker compose.yaml`
+  `whoami-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -782,7 +782,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
         name: $DEFAULT_NETWORK
   ```
 
-  `nginx-docker compose.yaml`
+  `nginx-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -804,9 +804,9 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
         name: $DEFAULT_NETWORK
   ```
 - **그 망할 컨테이너를 실행하세요**</br>
-  `docker compose -f traefik-docker compose.yaml up -d`</br>
-  `docker compose -f whoami-docker compose.yaml up -d`</br>
-  `docker compose -f nginx-docker compose.yaml up -d`</br>
+  `docker compose -f traefik-docker-compose.yaml up -d`</br>
+  `docker compose -f whoami-docker-compose.yaml up -d`</br>
+  `docker compose -f nginx-docker-compose.yaml up -d`</br>
 
 == 여기까지 작업함
 
@@ -816,7 +816,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
   
   다시 말하지만, `*.whateverblablabla.org` 및 `whateverblablabla.org`를 traefik의 IP를 가리키는 A 레코드로 DNS 제어판에서 설정합니다.
 
-  `traefik-docker compose.yaml`
+  `traefik-docker-compose.yaml`
   ```
   version: "3.7"
 
@@ -850,7 +850,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
   이제 컨테이너가 하위 도메인으로 액세스하려면 URL에 대한 규칙이 있고 443 포트 진입점(엔트리포인트)에 있어야 하며 동일한 `lets-encr` 인증서 확인자(리졸버)를 사용하는 일반 라우터만 있으면 됩니다.
 
-    `whoami-docker compose.yaml`
+    `whoami-docker-compose.yaml`
     ```
     version: "3.7"
 
@@ -871,7 +871,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
           name: $DEFAULT_NETWORK
     ```
 
-    `nginx-docker compose.yaml`
+    `nginx-docker-compose.yaml`
     ```
     version: "3.7"
 
@@ -894,7 +894,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
   다음은 아파치이지만 이번에는 네이키드 도메인 `whateverblablabla.org`에서 실행됩니다.
     
-    `apache-docker compose.yaml`
+    `apache-docker-compose.yaml`
     ```
     version: "3.7"
 
@@ -952,7 +952,7 @@ acme.json이 :ro -읽기 전용- 가 **아니**라는 점에 유의하세요.
 
  다음은 이전 장의 DNS 챌린지 레이블이 포함된 전체 traefik 작성(compose)입니다:
     
-  `traefik-docker compose.yaml`
+  `traefik-docker-compose.yaml`
   ```
   version: "3.7"
 
