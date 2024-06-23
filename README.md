@@ -108,11 +108,12 @@
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
           - "./traefik.yaml:/traefik.yaml:ro"
-
+    
     networks:
-      default:
-        external:
-          name: $DEFAULT_NETWORK
+      network:
+        name: $DEFAULT_NETWORK
+        external: true
+
     ```
 
 - **traefik-docker-compose.yaml 실행**</br>
@@ -168,11 +169,11 @@
         - "traefik.enable=true"
         - "traefik.http.routers.whoami.entrypoints=web"
         - "traefik.http.routers.whoami.rule=Host(`whoami.$MY_DOMAIN`)"
-
+  
   networks:
-    default:
-      external:
-        name: $DEFAULT_NETWORK
+    network:
+      name: $DEFAULT_NETWORK
+      external: true
   ```
 
   `nginx-docker-compose.yaml`
@@ -190,9 +191,9 @@
         - "traefik.http.routers.nginx.rule=Host(`nginx.$MY_DOMAIN`)"
 
   networks:
-    default:
-      external:
-        name: $DEFAULT_NETWORK
+    network:
+      name: $DEFAULT_NETWORK
+      external: true
   ```
 
   `apache-docker-compose.yaml`
@@ -210,9 +211,9 @@
         - "traefik.http.routers.apache.rule=Host(`apache.$MY_DOMAIN`)"
 
   networks:
-    default:
-      external:
-        name: $DEFAULT_NETWORK
+    network:
+      name: $DEFAULT_NETWORK
+      external: true
   ```
 
   `portainer-docker-compose.yaml`
@@ -233,9 +234,9 @@
         - "traefik.http.routers.portainer.rule=Host(`portainer.$MY_DOMAIN`)"
 
   networks:
-    default:
-      external:
-        name: $DEFAULT_NETWORK
+    network:
+      name: $DEFAULT_NETWORK
+      external: true
 
   volumes:
     portainer_data:
